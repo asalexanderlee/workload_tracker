@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			*{
+				font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+			}
+			#main{
+				background-color:#e6e6e6;
+				padding:30px;	
+			}
+			.acc{
+				background-color:#cce6ff;
+				border-radius:2px;
+				box-shadow:2px 2px 10px gray;
+				padding:0px;
+				width:50%;
+				height:50px;	
+				text-align:center;
+				margin-left:10%;
+				cursor:pointer;
+				transition:0.5s;
+				border:1px solid lightgray;
+				overflow:hidden;
+			}
+			.content{	
+				background-color:#e6f3ff;
+				border-radius:2px;
+				position:relative;
+				transition:0.5s;
+			}
+			.down-arrow{
+				width:20px;
+				height:15px;	
+			}
+			.close-icon{
+				width:20px;
+				height:20px;
+				margin:8px;
+				float:right;
+				cursor:pointer;	
+			}
+			.content_table{
+				width:100%;	
+				border-bottom:2px solid lightgray;
+			}
+			.content_table td{
+				padding:10px;
+			}
+			.prof_td{
+				width:40%;	
+			}
+			.pos_td{
+				width:10%;	
+			}
+			.yr_td{
+				width:7%;
+			}
+			.replace_td{
+				width:43%;	
+			}
+			.replacement_input{
+				padding:3px;	
+			}
+			li{
+				display:block;	
+			}
+			.replace_button{
+				background-color:#cccccc;
+				border-radius:4px;
+				border:1px solid gray;
+				cursor:pointer;	
+			}
+			.revert{
+				background-color:#ffe6e6;
+				border:1px solid lightgray;
+				cursor:pointer;
+				border-radius:4px;	
+			}
+			#submit_changes{
+				background-color:#009999;
+				color:white;
+				padding:10px;
+				margin:10px;
+				margin-left:50%;
+				font-size:16px;
+				border:1px solid gray;
+				transition:0.5s;
+				border-radius:2px;	
+			}
+			#submit_changes:hover{
+				box-shadow: 4px 4px 10px gray;
+				cursor:pointer;	
+			}
+			#are_you_sure{
+				display:none;
+				background-color:#e6e6e6;
+				border:1px solid #e6e6e6;
+				border-radius:4px;
+				box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 8px 20px 0 rgba(0, 0, 0, 0.19);
+				padding:10px;
+				position:fixed;
+				top:25%;
+				left:28%;
+				width:40%;
+				z-index:2;		
+			}
+			#blackout{
+				position:fixed;
+				display:none;
+				z-index:1;
+				width:100%;
+				height:100%;
+				margin:0px;
+				top:0px;
+				left:0px;
+				background-color:black;
+				opacity:0.5;	
+			}
+			.replace_lst{
+				color:#009999;
+				text-align:center;	
+			}
+			.bold_checkout{
+				margin-left:10px;
+				margin-right:10px;
+				font-size:18px;	
+			}
+		</style>
+		<script>
+			
+			PROFS_LEAVING = [];
+			PROFS_REPLACING = [];
+			function toggleAcc(ID){
+				var curAcc = document.getElementById(ID);
+				var curAccLen = (document.getElementsByClassName(ID + "_content")).length;
+				if (curAcc.style.height == "50px"){
+					var newHeight = String(50 + (curAccLen * 45)) + "px";
+					curAcc.style.height = newHeight;
+				}
+				else{
+					curAcc.style.height = "50px";	
+				}
+			}
+			function removeFromArray(name, array){
+				var index = array.indexOf(name);
+				if (index != -1){
+					array.splice(index, 1);	
+				}
+			}
+			function changeName(inputID, oldNameID){
+				var input = document.getElementById(inputID).value;
+				if (input == ""){
+					window.alert("Please enter a name.");	
+				}
+				else{
+					var oldName = oldNameID;
+					document.getElementById(oldNameID).innerHTML = "<b>" + input + "</b>";
+					
+					if ((document.getElementsByClassName('revert')).length == 0){
+						var revertInput = document.createElement("INPUT");
+						revertInput.type = "button";
+						revertInput.className = "revert";
+						revertInput.value = "Revert";
+						revertInput.onclick = function(){
+							document.getElementById(oldNameID).innerHTML = "<b>" + oldName + "</b>";
+							var parent = document.getElementById(inputID).parentElement;
+							parent.removeChild(revertInput);
+						
+							removeFromArray(oldName, PROFS_LEAVING);
+							removeFromArray(input, PROFS_REPLACING);
+						}
+					
+						PROFS_LEAVING.push(oldName);
+						PROFS_REPLACING.push(input);
+					}
+					else{
+						var curIndex = PROFS_LEAVING.indexOf(oldName);	
+						PROFS_REPLACING[curIndex] = input;
+					}
+					
+					var appendTo = document.getElementById(inputID).parentElement;
+					appendTo.appendChild(revertInput);
+					document.getElementById(inputID).value = "";
+				}	
+			}
+			function checkout(){
+				var curDiv = document.getElementById('are_you_sure');
+				curDiv.style.display = "block";
+				document.getElementById("blackout").style.display = "block";
+				
+				for (var i = 0; i < PROFS_LEAVING.length; i++){
+					var curP = document.createElement("P");
+					curP.className = "replace_lst";
+					curP.appendChild(document.createTextNode("You replaced "));
+					
+					var profLeftBold = document.createElement("B");
+					profLeftBold.style.marginLeft = "10px";
+					profLeftBold.style.marginRight = "10px";
+					profLeftBold.style.fontSize = "18px";
+					profLeftBold.appendChild(document.createTextNode(PROFS_LEAVING[i]));
+					curP.appendChild(profLeftBold);
+	
+					curP.appendChild(document.createTextNode(" with "));
+					
+					var profReplaceBold = document.createElement("B");
+					profReplaceBold.style.marginLeft = "10px";
+					profReplaceBold.style.fontSize = "18px";
+					profReplaceBold.appendChild(document.createTextNode(PROFS_REPLACING[i]));
+					curP.appendChild(profReplaceBold);
+					
+					curP.appendChild(document.createTextNode("."));
+					
+					curDiv.appendChild(curP);
+				}
+				
+				var p = document.createElement("P");
+				p.style.textAlign = "center";
+				p.style.fontSize = "18px";
+				p.appendChild(document.createTextNode("Do you still wish to proceed?"));
+				curDiv.appendChild(p);
+				
+				var no = document.createElement("INPUT");
+				
+			}
+		</script>
+	</head>
+	<body>
+		<div id="blackout">
+		</div>
+		<h1 style="font-size:40px;text-align:center;">Find and Fill Upcoming Vacancies</h1>
+		<div id="main">
+			<!-- Generate for each committee -->
+			<ul>
+			<li>
+			<div id="review_board_acc" style="height:50px;" class="acc" onclick="toggleAcc('review_board_acc')">
+				<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Grey_close_x.svg/1024px-Grey_close_x.svg.png" class="close-icon" onclick="document.getElementById('review_board_acc').style.display = 'none';">
+				<p>Review Board (2 points)</p>
+				<!--<img src="http://2r3fd65rdnr4efnwp2y2f1xt.wpengine.netdna-cdn.com/wp-content/uploads/arrow-down-gray-hi.png" class="down-arrow">-->
+				<div class="content">
+					<table class="review_board_acc_content content_table">
+						<tr>
+							<td class="prof_td"><b>Parker, Alan M</b></td>
+							<td class="pos_td">AL</td>
+							<td class="yr_td">'19</td>
+							<td class="replace_td"></td>
+						</tr>
+					</table>
+					<table class="review_board_acc_content content_table">
+						<tr>
+							<td class="prof_td"><b>Dietz, Vivien E</b></td>
+							<td class="pos_td">AL</td>
+							<td class="yr_td">'18</td>
+							<td class="replace_td"></td>
+						</tr>
+					</table>
+				<div>
+			</div>
+			</li>
+			
+			<li>
+			<div id="equity_advisors_acc" style="height:50px;" class="acc" onclick="toggleAcc('equity_advisors_acc')">
+				<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Grey_close_x.svg/1024px-Grey_close_x.svg.png" class="close-icon" onclick="document.getElementById('equity_advisors_acc').style.display = 'none';">
+				<p>Equity Advisors (0 points)</p>
+				<div class="content">
+					<table class="equity_advisors_acc_content content_table">
+						<tr>
+							<td class="prof_td"><b>Cho, Helen C</b></td>
+							<td class="pos_td">PRES</td>
+							<td class="yr_td">'17</td>
+							<td class="replace_td"></td>
+						</tr>
+					</table>
+					<table class="equity_advisors_acc_content content_table">
+						<tr>
+							<td class="prof_td"><b>Denham, Scott D</b></td>
+							<td class="pos_td">PRES</td>
+							<td class="yr_td">'17</td>
+							<td class="replace_td"></td>
+						</tr>
+					</table>
+					<table class="equity_advisors_acc_content content_table">
+						<tr>
+							<td class="prof_td"><b>Kelly, Hilton K</b></td>
+							<td class="pos_td">PRES</td>
+							<td class="yr_td">'17</td>
+							<td class="replace_td"></td>
+						</tr>
+					</table>
+					<table class="equity_advisors_acc_content content_table">
+						<tr>
+							<td class="prof_td"><b>Molinek, Donna K</b></td>
+							<td class="pos_td">PRES</td>
+							<td class="yr_td">'17</td>
+							<td class="replace_td"></td>
+						</tr>
+					</table>
+					<table class="equity_advisors_acc_content content_table">
+						<tr>
+							<td class="prof_td"><b>Savage, Cort</b></td>
+							<td class="pos_td">PRES</td>
+							<td class="yr_td">'17</td>
+							<td class="replace_td"></td>
+						</tr>
+					</table>
+					<table class="equity_advisors_acc_content content_table">
+						<tr>
+							<td class="prof_td"><b>Davis, Stephen L</b></td>
+							<td class="pos_td">PRES</td>
+							<td class="yr_td">'17</td>
+							<td class="replace_td"></td>
+						</tr>
+					</table>
+					<table class="equity_advisors_acc_content content_table">
+						<tr>
+							<td class="prof_td"><b>Mahony, William K</b></td>
+							<td class="pos_td">PRES</td>
+							<td class="yr_td">'17</td>
+							<td class="replace_td"></td>
+						</tr>
+					</table>
+					<table class="equity_advisors_acc_content content_table">
+						<tr>
+							<td class="prof_td"><b>Poland, Lynn M</b></td>
+							<td class="pos_td">PRES</td>
+							<td class="yr_td">'17</td>
+							<td class="replace_td"></td>
+						</tr>
+					</table>
+				<div>
+			</div>
+			</li>
+			
+			<li>
+			<div id="student_study_and_research_acc" style="height:50px;" class="acc pres hum">
+				<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Grey_close_x.svg/1024px-Grey_close_x.svg.png" class="close-icon" onclick="document.getElementById('student_study_and_research_acc').style.display = 'none';">
+				<p onclick="toggleAcc('student_study_and_research_acc')">Student Study and Research (2 points)</p>
+				<!--<img src="http://2r3fd65rdnr4efnwp2y2f1xt.wpengine.netdna-cdn.com/wp-content/uploads/arrow-down-gray-hi.png" class="down-arrow">-->
+				<div class="content">
+					<table class="student_study_and_research_acc_content content_table">
+						<tr>
+							<td class="prof_td"><b>Wiemers, Alice</b></td>
+							<td class="pos_td">SS</td>
+							<td class="yr_td">'17</td>
+							<td class="replace_td"></td>
+						</tr>
+					</table>
+					<table class="student_study_and_research_acc_content content_table">
+						<tr>
+							<td class="prof_td"><b>Lawing, William D</b></td>
+							<td class="pos_td">PRES</td>
+							<td class="yr_td">'17</td>
+							<td class="replace_td"></td>
+						</tr>
+					</table>
+					<table class="student_study_and_research_acc_content content_table">
+						<tr>
+							<td class="prof_td" id="Doe, Jane"><b>Doe, Jane</b></td>
+							<td class="pos_td">PRES</td>
+							<td class="yr_td">'16</td>
+							<td class="replace_td">
+							<input type="text" class="replacement_input" id="replace_Doe, Jane" value="" placeholder="Replacement Member"/>
+									<input type="button" class="replace_button" onclick="changeName('replace_Doe, Jane', 'Doe, Jane')" value="Enter">
+								</td>
+						</tr>
+					</table>
+				<div>
+			</div>
+			</li>
+			
+			</ul>
+			
+			<input type="button" value="Submit Changes" id="submit_changes" onclick="checkout()"/>
+			<div id="are_you_sure">
+				<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Grey_close_x.svg/1024px-Grey_close_x.svg.png" class="close-icon" onclick="document.getElementById('are_you_sure').style.display = 'none';document.getElementById('blackout').style.display = 'none';">
+				<p style="text-align:center;font-size:18px;">Your Changes:</p>
+			</div>
+		</div> <!--main body end -->
+	</body>
+</html>
