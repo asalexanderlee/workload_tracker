@@ -8,13 +8,15 @@
 			#main{
 				background-color:#e6e6e6;
 				padding:30px;	
+              min-height:600px;
+              margin:20px;
+              margin-bottom:100px;
 			}
 			.acc{
 				background-color:#cce6ff;
 				border-radius:2px;
 				box-shadow:2px 2px 10px gray;
 				padding:0px;
-				width:50%;
 				height:50px;	
 				text-align:center;
 				margin-left:10%;
@@ -23,6 +25,12 @@
 				border:1px solid lightgray;
 				overflow:hidden;
 			}
+          #main ul{
+            width:60%;
+            min-width:590px;
+            float:left;
+            margin-right:20px;
+          }
 			.content{	
 				background-color:#e6f3ff;
 				border-radius:2px;
@@ -57,7 +65,7 @@
 				width:7%;
 			}
 			.replace_td{
-				width:43%;	
+				width:43%;
 			}
 			.replacement_input{
 				padding:3px;	
@@ -126,11 +134,100 @@
 				margin-right:10px;
 				font-size:18px;	
 			}
+          #ok{
+            background-color:#cccccc;
+            border:1px solid #bfbfbf;
+            border-radius:3px;
+            cursor:pointer;
+            padding:5px;
+            font-size:15px;
+            margin-left: 40%;
+          }
+          #ok:hover{
+            background-color:#99bbff;
+          }
+          #no{
+            background-color:#668cff;
+            border:1px solid #668cff;
+            border-radius:3px;
+            cursor:pointer;
+            padding:10px;
+            font-size:15px;
+            float:left;
+          }
+          #ok:hover{
+            background-color:#99bbff;
+          }
+          #yes{
+            background-color:#cccccc;
+            border:1px solid #bfbfbf;
+            border-radius:3px;
+            cursor:pointer;
+            padding:10px;
+            font-size:15px;
+            float:right;
+          }
+          #yes:hover{
+            background-color:#99bbff;
+          }
+          #open-collapse{
+            background-color:#cccccc;
+            width:8%;
+            margin-top:0px;
+            padding:5px;
+            height:35px;
+            text-align:center;
+            box-shadow:2px 2px 2px gray;
+            border-radius:10px;
+            cursor:pointer;
+          }
+          #filter_div{
+            float:right;
+            background-color:white;
+            width:30%;
+            box-shadow: 5px 5px 10px gray;
+            margin-top:15px;
+            padding:10px;
+            padding-top:5px;
+            margin-bottom:20px;
+            
+          }
+          .filter_container{
+            background-color:lightgray;
+            box-shadow: inset 2px 2px 8px gray;
+            padding:5px;
+            margin:20px;
+          }
+          .checkbox{
+            margin:10px;
+          }
 		</style>
 		<script>
 			
 			PROFS_LEAVING = [];
 			PROFS_REPLACING = [];
+          function toggleCollapseBtn(){
+            var btn = document.getElementById("open-collapse");
+            if (btn.innerHTML == "Open All"){
+              btn.innerHTML = "Collapse All";
+              btn.style.backgroundColor = "#737373";
+              btn.style.color = "white";
+              btn.style.boxShadow = "2px 2px 2px black";
+            }
+            else{
+              btn.innerHTML = "Open All";
+              btn.style.backgroundColor = "#cccccc";
+              btn.style.color = "black";
+              btn.style.boxShadow = "2px 2px 2px gray";
+            }
+          }
+          function toggleCollapse(){
+            toggleCollapseBtn();
+            var accs = document.getElementsByClassName("acc");
+            for (var i = 0; i < accs.length; i++){
+              toggleAcc(accs[i].id);
+            }
+          }
 			function toggleAcc(ID){
 				var curAcc = document.getElementById(ID);
 				var curAccLen = (document.getElementsByClassName(ID + "_content")).length;
@@ -184,45 +281,176 @@
 					document.getElementById(inputID).value = "";
 				}	
 			}
+          function removeElement(element){
+            var parent = element.parentElement;
+            parent.removeChild(element);
+          }
+          function closeMsg(curDiv){
+            curDiv.style.display = "none";
+		    document.getElementById("blackout").style.display = "none";
+          }
+          function deleteMsg(){
+            removeElement(document.getElementById("your_changes"));
+            removeElement(document.getElementById("do_you_wish_to_proceed"));
+            var replaceLst = document.getElementsByClassName("replace_lst");
+            for (var i = 0; i < replaceLst.length; i++){
+              removeElement(replaceLst[i]);
+            }
+            removeElement(document.getElementById("no"));
+            removeElement(document.getElementById("yes"));
+            
+            document.getElementById("are_you_sure").style.display = "none";
+            document.getElementById("blackout").style.display = "none";
+          }
+          function deleteNoChangeMsg(){
+            removeElement(document.getElementById("ok"));
+            removeElement(document.getElementById("no_changes"));
+            
+            document.getElementById("are_you_sure").style.display = "none";
+            document.getElementById("blackout").style.display = "none";
+          }
+            function createChangesMsg(curDiv){
+              var yourChanges = document.createElement("P");
+              yourChanges.style.textAlign = "center";
+              yourChanges.style.fontSize = "18px";
+              yourChanges.id = "your_changes";
+              yourChanges.appendChild(document.createTextNode("Your Changes: "));
+              curDiv.appendChild(yourChanges);
+                  
+              for (var i = 0; i < PROFS_LEAVING.length; i++){
+                  var curP = document.createElement("P");
+                  curP.className = "replace_lst";
+                  curP.appendChild(document.createTextNode("You replaced "));
+
+                  var profLeftBold = document.createElement("B");
+                  profLeftBold.style.marginLeft = "10px";
+                  profLeftBold.style.marginRight = "10px";
+                  profLeftBold.style.fontSize = "18px";
+                  profLeftBold.appendChild(document.createTextNode(PROFS_LEAVING[i]));
+                  curP.appendChild(profLeftBold);
+
+                  curP.appendChild(document.createTextNode(" with "));
+
+                  var profReplaceBold = document.createElement("B");
+                  profReplaceBold.style.marginLeft = "10px";
+                  profReplaceBold.style.fontSize = "18px";
+                  profReplaceBold.appendChild(document.createTextNode(PROFS_REPLACING[i]));
+                  curP.appendChild(profReplaceBold);
+
+                  curP.appendChild(document.createTextNode("."));
+
+                  curDiv.appendChild(curP);
+               }
+
+               var p = document.createElement("P");
+               p.style.textAlign = "center";
+               p.style.fontSize = "18px";
+              p.id = "do_you_wish_to_proceed";
+               p.appendChild(document.createTextNode("Do you still wish to proceed?"));
+               curDiv.appendChild(p);
+
+               var no = document.createElement("INPUT");
+              no.type = "button";
+              no.value = "No";
+              no.id = "no";
+              var yes = document.createElement("INPUT");
+              yes.type = "button";
+              yes.value = "Yes";
+              yes.id = "yes";
+              no.onclick = function(){
+                removeElement(p);
+                removeElement(curP);
+                removeElement(yourChanges);
+                removeElement(no);
+                removeElement(yes);
+                closeMsg(curDiv);
+              }
+              curDiv.appendChild(no);
+              
+              yes.onclick = function(){
+                removeElement(p);
+                removeElement(curP);
+                removeElement(yourChanges);
+                removeElement(no);
+                removeElement(yes);
+                closeMsg(curDiv);
+              }
+              curDiv.appendChild(yes);
+              
+              document.getElementById("close_msg").onclick = function(){
+                  deleteMsg();
+                }
+            }
 			function checkout(){
 				var curDiv = document.getElementById('are_you_sure');
 				curDiv.style.display = "block";
 				document.getElementById("blackout").style.display = "block";
 				
-				for (var i = 0; i < PROFS_LEAVING.length; i++){
-					var curP = document.createElement("P");
-					curP.className = "replace_lst";
-					curP.appendChild(document.createTextNode("You replaced "));
-					
-					var profLeftBold = document.createElement("B");
-					profLeftBold.style.marginLeft = "10px";
-					profLeftBold.style.marginRight = "10px";
-					profLeftBold.style.fontSize = "18px";
-					profLeftBold.appendChild(document.createTextNode(PROFS_LEAVING[i]));
-					curP.appendChild(profLeftBold);
-	
-					curP.appendChild(document.createTextNode(" with "));
-					
-					var profReplaceBold = document.createElement("B");
-					profReplaceBold.style.marginLeft = "10px";
-					profReplaceBold.style.fontSize = "18px";
-					profReplaceBold.appendChild(document.createTextNode(PROFS_REPLACING[i]));
-					curP.appendChild(profReplaceBold);
-					
-					curP.appendChild(document.createTextNode("."));
-					
-					curDiv.appendChild(curP);
-				}
-				
-				var p = document.createElement("P");
-				p.style.textAlign = "center";
-				p.style.fontSize = "18px";
-				p.appendChild(document.createTextNode("Do you still wish to proceed?"));
-				curDiv.appendChild(p);
-				
-				var no = document.createElement("INPUT");
+                if (PROFS_LEAVING.length != 0){
+                  /*<p style="text-align:center;font-size:18px;">Your Changes:</p>*/
+                  createChangesMsg(curDiv);
+                }
+              else{
+                var p = document.createElement("P");
+                p.style.textAlign = "center";
+                p.style.fontSize = "18px";
+                p.id = "no_changes";
+                p.appendChild(document.createTextNode("You have made no changes."));
+                curDiv.appendChild(p);
+                
+                var ok = document.createElement("INPUT");
+                ok.type = "button";
+                ok.id = "ok";
+                ok.value = "OK";
+                ok.onclick = function(){
+				  curDiv.style.display = "none";
+				  document.getElementById("blackout").style.display = "none";
+                  var parent = ok.parentElement;
+                  parent.removeChild(ok);
+                  parent = p.parentElement;
+                  parent.removeChild(p);
+                }
+                
+                curDiv.appendChild(ok);
+                
+                document.getElementById("close_msg").onclick = function(){
+                  deleteNoChangeMsg();
+                }
+              }
 				
 			}
+          function toggleCheckbox(ID){
+            var curElem = document.getElementById(ID);
+            var curElemInput = document.getElementById(curElem.htmlFor);
+            if (curElemInput.checked){
+              curElem.style.color = "#258e8e";
+            }
+            else{
+              curElem.style.color = "black";
+            }
+          }
+          function hasClass(target, classname) {
+             var lst = target.classList;    
+            return lst.contains(classname);
+          }
+          
+          function filter(classname, label){
+            toggleCheckbox(label);
+            var allAccs = document.getElementsByClassName("acc");
+            
+            var curInput = document.getElementById(document.getElementById(label).htmlFor);
+
+            if (curInput.checked){
+              for (var i = 0; i < allAccs.length; i++){
+                if (!hasClass(allAccs[i], classname)){
+                  allAccs[i].style.display = "none";
+                }
+              }
+            }
+            else{
+               
+            }
+          }
 		</script>
 	</head>
 	<body>
@@ -230,10 +458,11 @@
 		</div>
 		<h1 style="font-size:40px;text-align:center;">Find and Fill Upcoming Vacancies</h1>
 		<div id="main">
+          <p id="open-collapse" onclick="toggleCollapse();">Open All</p>
 			<!-- Generate for each committee -->
 			<ul>
 			<li>
-			<div id="review_board_acc" style="height:50px;" class="acc" onclick="toggleAcc('review_board_acc')">
+			<div id="review_board_acc" style="height:50px;" class="acc al 2_pt" onclick="toggleAcc('review_board_acc')">
 				<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Grey_close_x.svg/1024px-Grey_close_x.svg.png" class="close-icon" onclick="document.getElementById('review_board_acc').style.display = 'none';">
 				<p>Review Board (2 points)</p>
 				<!--<img src="http://2r3fd65rdnr4efnwp2y2f1xt.wpengine.netdna-cdn.com/wp-content/uploads/arrow-down-gray-hi.png" class="down-arrow">-->
@@ -259,7 +488,7 @@
 			</li>
 			
 			<li>
-			<div id="equity_advisors_acc" style="height:50px;" class="acc" onclick="toggleAcc('equity_advisors_acc')">
+			<div id="equity_advisors_acc" style="height:50px;" class="acc pres 0_pt" onclick="toggleAcc('equity_advisors_acc')">
 				<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Grey_close_x.svg/1024px-Grey_close_x.svg.png" class="close-icon" onclick="document.getElementById('equity_advisors_acc').style.display = 'none';">
 				<p>Equity Advisors (0 points)</p>
 				<div class="content">
@@ -332,7 +561,7 @@
 			</li>
 			
 			<li>
-			<div id="student_study_and_research_acc" style="height:50px;" class="acc pres hum">
+			<div id="student_study_and_research_acc" style="height:50px;" class="acc pres ss 2_pt vacancy">
 				<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Grey_close_x.svg/1024px-Grey_close_x.svg.png" class="close-icon" onclick="document.getElementById('student_study_and_research_acc').style.display = 'none';">
 				<p onclick="toggleAcc('student_study_and_research_acc')">Student Study and Research (2 points)</p>
 				<!--<img src="http://2r3fd65rdnr4efnwp2y2f1xt.wpengine.netdna-cdn.com/wp-content/uploads/arrow-down-gray-hi.png" class="down-arrow">-->
@@ -370,11 +599,34 @@
 			
 			</ul>
 			
+            <div id="filter_div">
+              <p style="text-align:center;border-bottom:1px solid black;">Filter By</p>
+              <input type="checkbox" class="checkbox" id="only_vacancies" onclick="filter('vacancy', 'only_vacancies_text');"/><label for="only_vacancies" id="only_vacancies_text">Only committees with vacancies</label>
+              <p style="color:gray;margin-left:20px;">Position:</p>
+              <div class="filter_container">
+                <input type="checkbox" class="checkbox" id="al" onclick="filter('al', 'al_text');"/><label for="al" id="al_text">At Large (AL)</label><br>
+                <input type="checkbox" class="checkbox" id="pres" onclick="filter('pres','pres_text');"/><label for="pres" id="pres_text">Presidential Appointment (PRES)</label><br>
+                <input type="checkbox" class="checkbox" id="ss" onclick="toggleCheckbox('ss_text');"/><label for="ss" id="ss_text">Social Sciences (SS)</label><br>
+                <input type="checkbox" class="checkbox" id="nsm" onclick="toggleCheckbox('nsm_text');"/><label for="nsm" id="nsm_text">Natural Science and Math (NSM)</label><br>
+                <input type="checkbox" class="checkbox" id="hum" onclick="toggleCheckbox('hum_text');"/><label for="hum" id="hum_text">Humanities (HUM)</label><br>
+              </div>
+              <p style="color:gray;margin-left:20px;">Points:</p>
+              <div class="filter_container">
+                <input type="checkbox" class="checkbox" id="0_pt" onclick="toggleCheckbox('0_pt_text');"/><label for="0_pt" id="0_pt_text">0</label>
+                <input type="checkbox" class="checkbox" id="1_pt" onclick="toggleCheckbox('1_pt_text');"/><label for="1_pt" id="1_pt_text">1</label>
+                <input type="checkbox" class="checkbox" id="2_pt" onclick="toggleCheckbox('2_pt_text');"/><label for="2_pt" id="2_pt_text">2</label>
+                <input type="checkbox" class="checkbox" id="3_pt" onclick="toggleCheckbox('3_pt_text');"/><label for="3_pt" id="3_pt_text">3+</label>
+              </div>
+            </div>
+             
+              
+              
 			<input type="button" value="Submit Changes" id="submit_changes" onclick="checkout()"/>
 			<div id="are_you_sure">
-				<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Grey_close_x.svg/1024px-Grey_close_x.svg.png" class="close-icon" onclick="document.getElementById('are_you_sure').style.display = 'none';document.getElementById('blackout').style.display = 'none';">
-				<p style="text-align:center;font-size:18px;">Your Changes:</p>
+				<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Grey_close_x.svg/1024px-Grey_close_x.svg.png" class="close-icon" id="close_msg" onclick="deleteMsg();">
 			</div>
+              
 		</div> <!--main body end -->
 	</body>
 </html>
+
