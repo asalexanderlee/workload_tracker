@@ -11,6 +11,7 @@
               min-height:600px;
               margin:20px;
               margin-bottom:100px;
+              min-width:1060px;
 			}
 			.acc{
 				background-color:#cce6ff;
@@ -27,7 +28,7 @@
 			}
           #main ul{
             width:60%;
-            min-width:590px;
+            min-width:660px;
             float:left;
             margin-right:20px;
           }
@@ -66,6 +67,7 @@
 			}
 			.replace_td{
 				width:43%;
+              border:1px solid black;
 			}
 			.replacement_input{
 				padding:3px;	
@@ -200,6 +202,13 @@
           }
           .checkbox{
             margin:10px;
+          }
+          .replace_choices{
+            position:fixed;
+            width:100px;
+            background-color:white;
+            margin-left:3.5%;
+            
           }
 		</style>
 		<script>
@@ -434,6 +443,20 @@
             return lst.contains(classname);
           }
           
+          function restore(){
+            var allAccs = document.getElementsByClassName("acc");
+            for (var i = 0; i < allAccs.length; i++){
+              allAccs[i].style.display = "block";
+            }
+            
+            var allInputs = document.getElementsByClassName("checkbox");
+            for (var j = 0; j < allInputs.length; j++){
+              if (allInputs[j].checked){
+                filter(allInputs[j].id, (allInputs[j].id + "_text"));
+              }
+            }
+          }
+          
           function filter(classname, label){
             toggleCheckbox(label);
             var allAccs = document.getElementsByClassName("acc");
@@ -448,7 +471,7 @@
               }
             }
             else{
-               
+               restore();
             }
           }
 		</script>
@@ -589,6 +612,10 @@
 							<td class="yr_td">'16</td>
 							<td class="replace_td">
 							<input type="text" class="replacement_input" id="replace_Doe, Jane" value="" placeholder="Replacement Member"/>
+                            <div class="replace_choices">
+                              <p class="prof_choice" id="asalexanderlee">Alexander-Lee, Ashley</p>
+                              <p class="prof_choices" id="hemulat">Mulat, Hermon</p>
+                            </div>
 									<input type="button" class="replace_button" onclick="changeName('replace_Doe, Jane', 'Doe, Jane')" value="Enter">
 								</td>
 						</tr>
@@ -601,21 +628,21 @@
 			
             <div id="filter_div">
               <p style="text-align:center;border-bottom:1px solid black;">Filter By</p>
-              <input type="checkbox" class="checkbox" id="only_vacancies" onclick="filter('vacancy', 'only_vacancies_text');"/><label for="only_vacancies" id="only_vacancies_text">Only committees with vacancies</label>
+              <input type="checkbox" class="checkbox" id="vacancy" onclick="filter('vacancy', 'vacancy_text');"/><label for="vacancy" id="vacancy_text">Only committees with vacancies</label>
               <p style="color:gray;margin-left:20px;">Position:</p>
               <div class="filter_container">
                 <input type="checkbox" class="checkbox" id="al" onclick="filter('al', 'al_text');"/><label for="al" id="al_text">At Large (AL)</label><br>
                 <input type="checkbox" class="checkbox" id="pres" onclick="filter('pres','pres_text');"/><label for="pres" id="pres_text">Presidential Appointment (PRES)</label><br>
-                <input type="checkbox" class="checkbox" id="ss" onclick="toggleCheckbox('ss_text');"/><label for="ss" id="ss_text">Social Sciences (SS)</label><br>
-                <input type="checkbox" class="checkbox" id="nsm" onclick="toggleCheckbox('nsm_text');"/><label for="nsm" id="nsm_text">Natural Science and Math (NSM)</label><br>
-                <input type="checkbox" class="checkbox" id="hum" onclick="toggleCheckbox('hum_text');"/><label for="hum" id="hum_text">Humanities (HUM)</label><br>
+                <input type="checkbox" class="checkbox" id="ss" onclick="filter('ss','ss_text');"/><label for="ss" id="ss_text">Social Sciences (SS)</label><br>
+                <input type="checkbox" class="checkbox" id="nsm" onclick="filter('nsm','nsm_text');"/><label for="nsm" id="nsm_text">Natural Science and Math (NSM)</label><br>
+                <input type="checkbox" class="checkbox" id="hum" onclick="filter('hum','hum_text');"/><label for="hum" id="hum_text">Humanities (HUM)</label><br>
               </div>
               <p style="color:gray;margin-left:20px;">Points:</p>
               <div class="filter_container">
-                <input type="checkbox" class="checkbox" id="0_pt" onclick="toggleCheckbox('0_pt_text');"/><label for="0_pt" id="0_pt_text">0</label>
-                <input type="checkbox" class="checkbox" id="1_pt" onclick="toggleCheckbox('1_pt_text');"/><label for="1_pt" id="1_pt_text">1</label>
-                <input type="checkbox" class="checkbox" id="2_pt" onclick="toggleCheckbox('2_pt_text');"/><label for="2_pt" id="2_pt_text">2</label>
-                <input type="checkbox" class="checkbox" id="3_pt" onclick="toggleCheckbox('3_pt_text');"/><label for="3_pt" id="3_pt_text">3+</label>
+                <input type="checkbox" class="checkbox" id="0_pt" onclick="filter('0_pt','0_pt_text');"/><label for="0_pt" id="0_pt_text">0</label>
+                <input type="checkbox" class="checkbox" id="1_pt" onclick="filter('1_pt','1_pt_text');"/><label for="1_pt" id="1_pt_text">1</label>
+                <input type="checkbox" class="checkbox" id="2_pt" onclick="filter('2_pt','2_pt_text');"/><label for="2_pt" id="2_pt_text">2</label>
+                <input type="checkbox" class="checkbox" id="3_pt" onclick="filter('3_pt','3_pt_text');"/><label for="3_pt" id="3_pt_text">3+</label>
               </div>
             </div>
              
