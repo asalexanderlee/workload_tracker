@@ -68,6 +68,7 @@
 			.replace_td{
 				width:43%;
               border:1px solid black;
+              text-align:left;
 			}
 			.replacement_input{
 				padding:3px;	
@@ -80,12 +81,14 @@
 				border-radius:4px;
 				border:1px solid gray;
 				cursor:pointer;	
+              display:inline-block;
 			}
 			.revert{
 				background-color:#ffe6e6;
 				border:1px solid lightgray;
 				cursor:pointer;
-				border-radius:4px;	
+				border-radius:4px;
+              display:inline-block;
 			}
 			#submit_changes{
 				background-color:#009999;
@@ -205,16 +208,34 @@
           }
           .replace_choices{
             position:fixed;
-            width:100px;
-            background-color:white;
-            margin-left:3.5%;
+            width:120px;
+            background-color:#f2f2f2;
+            padding:0px;
+            display:none;
             
+          }
+          .prof_choice{
+            font-size:14px;
+            cursor:pointer;
+            padding:5px;
+            padding-left:0px;
+            padding-right:0px;
+            margin:0px;
+            border-bottom:1px solid #d9d9d9;
+            padding-left:5px;
+          }
+          .prof_choice:hover{
+            background-color:#ccdcff;
           }
 		</style>
 		<script>
 			
 			PROFS_LEAVING = [];
 			PROFS_REPLACING = [];
+          
+          
+  /*~~~~~~~~~~ Collapse/ Uncollapse Button ~~~~~~~~~~~~~~~~*/
+          
           function toggleCollapseBtn(){
             var btn = document.getElementById("open-collapse");
             if (btn.innerHTML == "Open All"){
@@ -230,6 +251,9 @@
               btn.style.boxShadow = "2px 2px 2px gray";
             }
           }
+          
+  /*~~~~~~~~~~~~~~~~~ Collapse/ Uncollapse ~~~~~~~~~~~~~~~~*/
+          
           function toggleCollapse(){
             toggleCollapseBtn();
             var accs = document.getElementsByClassName("acc");
@@ -237,6 +261,10 @@
               toggleAcc(accs[i].id);
             }
           }
+          
+          
+ /*~~~~~~~~~~~~~~~~~~ Toggle Individual Accordion ~~~~~~~~~~~~~~~~*/
+          
 			function toggleAcc(ID){
 				var curAcc = document.getElementById(ID);
 				var curAccLen = (document.getElementsByClassName(ID + "_content")).length;
@@ -248,13 +276,28 @@
 					curAcc.style.height = "50px";	
 				}
 			}
+          
+          
+ /*~~~~~~~~~~~~~~~~~~~~ Remove from Array ~~~~~~~~~~~~~~~*/
+          
 			function removeFromArray(name, array){
 				var index = array.indexOf(name);
 				if (index != -1){
 					array.splice(index, 1);	
 				}
 			}
-			function changeName(inputID, oldNameID){
+          
+          
+ /*~~~~~~~~~~~~~~~~~~~~ Filter Replacement Profs ~~~~~~~~~~~~~~~*/
+          
+          function filterProfs(replaceChoicesID){
+            document.getElementById(replaceChoicesID).style.display = "inline";
+          }
+          
+          
+ /*~~~~~~~~~~~~~~~~~~~~ Replace Name ~~~~~~~~~~~~~~~*/
+          
+			function changeName(inputID, oldNameID, replaceChoicesID){
 				var input = document.getElementById(inputID).value;
 				if (input == ""){
 					window.alert("Please enter a name.");	
@@ -290,14 +333,26 @@
 					document.getElementById(inputID).value = "";
 				}	
 			}
+          
+          
+/*~~~~~~~~~~~~~~~~~~~~ Remove HTML element ~~~~~~~~~~~~~~~*/
+          
           function removeElement(element){
             var parent = element.parentElement;
             parent.removeChild(element);
           }
+
+          
+/*~~~~~~~~~~~~~~~~~~~~ Close Submit Message ~~~~~~~~~~~~~~~*/
+          
           function closeMsg(curDiv){
             curDiv.style.display = "none";
 		    document.getElementById("blackout").style.display = "none";
           }
+          
+          
+/*~~~~~~~~~~~~~~~~~~~~ Delete Generated Message After Closing ~~~~~~~~~~~~~~~*/          
+          
           function deleteMsg(){
             removeElement(document.getElementById("your_changes"));
             removeElement(document.getElementById("do_you_wish_to_proceed"));
@@ -311,6 +366,10 @@
             document.getElementById("are_you_sure").style.display = "none";
             document.getElementById("blackout").style.display = "none";
           }
+          
+          
+ /*~~~~~~~~~~~~~~~~~~~~ Delete Generated No Changes Message After Closing ~~~~~~~~~~~~~~~*/
+          
           function deleteNoChangeMsg(){
             removeElement(document.getElementById("ok"));
             removeElement(document.getElementById("no_changes"));
@@ -318,7 +377,11 @@
             document.getElementById("are_you_sure").style.display = "none";
             document.getElementById("blackout").style.display = "none";
           }
-            function createChangesMsg(curDiv){
+          
+          
+ /*~~~~~~~~~~~~~~~~~~~~ Create Message with Summary of all Changes ~~~~~~~~~~~~~~~*/
+          
+          function createChangesMsg(curDiv){
               var yourChanges = document.createElement("P");
               yourChanges.style.textAlign = "center";
               yourChanges.style.fontSize = "18px";
@@ -390,13 +453,17 @@
                   deleteMsg();
                 }
             }
+          
+          
+ /*~~~~~~~~~~~~~~~~~~~~ Submit function ~~~~~~~~~~~~~~~*/
+          
 			function checkout(){
 				var curDiv = document.getElementById('are_you_sure');
 				curDiv.style.display = "block";
 				document.getElementById("blackout").style.display = "block";
 				
                 if (PROFS_LEAVING.length != 0){
-                  /*<p style="text-align:center;font-size:18px;">Your Changes:</p>*/
+                  /*<p style="text-align:center;font-size:18px;">Your Changes:</p>*/  
                   createChangesMsg(curDiv);
                 }
               else{
@@ -428,6 +495,10 @@
               }
 				
 			}
+          
+          
+ /*~~~~~~~~~~~~~~~~~~~~ Toggle Checkbox ~~~~~~~~~~~~~~~*/
+          
           function toggleCheckbox(ID){
             var curElem = document.getElementById(ID);
             var curElemInput = document.getElementById(curElem.htmlFor);
@@ -438,10 +509,17 @@
               curElem.style.color = "black";
             }
           }
+          
+          
+/*~~~~~~~~~~~~~~~~~~~~ Checks if the HTML has a class ~~~~~~~~~~~~~~~*/
+          
           function hasClass(target, classname) {
              var lst = target.classList;    
             return lst.contains(classname);
           }
+          
+          
+ /*~~~~~~~~~~~~~~~~~~~~ Restore all of the Divs after unchecking a filter input ~~~~~~~~~~~~~~~*/
           
           function restore(){
             var allAccs = document.getElementsByClassName("acc");
@@ -456,6 +534,9 @@
               }
             }
           }
+          
+          
+/*~~~~~~~~~~~~~~~~~~~~ Filter ~~~~~~~~~~~~~~~*/
           
           function filter(classname, label){
             toggleCheckbox(label);
@@ -477,18 +558,30 @@
 		</script>
 	</head>
 	<body>
+      
+      
+      <!--~~~~~~~~~~~~~~~~~ Blackout ~~~~~~~~~~~~~~~~~~~~~-->
+      
 		<div id="blackout">
 		</div>
+      
+      
+      <!--~~~~~~~~~~~~~~~~~ Header ~~~~~~~~~~~~~~~~~~~~~~~-->
+      
 		<h1 style="font-size:40px;text-align:center;">Find and Fill Upcoming Vacancies</h1>
+      
+      
+      <!--~~~~~~~~~~~~~~~~~ Main ~~~~~~~~~~~~~~~~~~~~~~~~-->
+      
 		<div id="main">
           <p id="open-collapse" onclick="toggleCollapse();">Open All</p>
+          
 			<!-- Generate for each committee -->
 			<ul>
 			<li>
 			<div id="review_board_acc" style="height:50px;" class="acc al 2_pt" onclick="toggleAcc('review_board_acc')">
 				<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Grey_close_x.svg/1024px-Grey_close_x.svg.png" class="close-icon" onclick="document.getElementById('review_board_acc').style.display = 'none';">
 				<p>Review Board (2 points)</p>
-				<!--<img src="http://2r3fd65rdnr4efnwp2y2f1xt.wpengine.netdna-cdn.com/wp-content/uploads/arrow-down-gray-hi.png" class="down-arrow">-->
 				<div class="content">
 					<table class="review_board_acc_content content_table">
 						<tr>
@@ -587,7 +680,6 @@
 			<div id="student_study_and_research_acc" style="height:50px;" class="acc pres ss 2_pt vacancy">
 				<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Grey_close_x.svg/1024px-Grey_close_x.svg.png" class="close-icon" onclick="document.getElementById('student_study_and_research_acc').style.display = 'none';">
 				<p onclick="toggleAcc('student_study_and_research_acc')">Student Study and Research (2 points)</p>
-				<!--<img src="http://2r3fd65rdnr4efnwp2y2f1xt.wpengine.netdna-cdn.com/wp-content/uploads/arrow-down-gray-hi.png" class="down-arrow">-->
 				<div class="content">
 					<table class="student_study_and_research_acc_content content_table">
 						<tr>
@@ -605,18 +697,18 @@
 							<td class="replace_td"></td>
 						</tr>
 					</table>
-					<table class="student_study_and_research_acc_content content_table">
+					<table class="student_study_and_research_acc_content content_table" style="border:1px solid black;">
 						<tr>
 							<td class="prof_td" id="Doe, Jane"><b>Doe, Jane</b></td>
 							<td class="pos_td">PRES</td>
 							<td class="yr_td">'16</td>
 							<td class="replace_td">
-							<input type="text" class="replacement_input" id="replace_Doe, Jane" value="" placeholder="Replacement Member"/>
-                            <div class="replace_choices">
+							<input type="text" class="replacement_input" onclick="document.getElementById('Doe, Jane_replace_choices').style.display = 'block';" id="replace_Doe, Jane" value="" placeholder="Replacement Member"/>
+									<input type="button" class="replace_button" onclick="changeName('replace_Doe, Jane', 'Doe, Jane', 'Doe, Jane_replace_choices')" value="Enter">
+                              <div class="replace_choices" id="Doe, Jane_replace_choices">
                               <p class="prof_choice" id="asalexanderlee">Alexander-Lee, Ashley</p>
-                              <p class="prof_choices" id="hemulat">Mulat, Hermon</p>
+                              <p class="prof_choice" id="hemulat">Mulat, Hermon</p>
                             </div>
-									<input type="button" class="replace_button" onclick="changeName('replace_Doe, Jane', 'Doe, Jane')" value="Enter">
 								</td>
 						</tr>
 					</table>
@@ -626,9 +718,16 @@
 			
 			</ul>
 			
+              
+            <!--~~~~~~~~~~~~~~ Filter Profs ~~~~~~~~~~~~-->
+              
             <div id="filter_div">
               <p style="text-align:center;border-bottom:1px solid black;">Filter By</p>
+              
+              <!--~~~~~~~~~~~ Only Vacancies ~~~~~~~~~~~~-->
               <input type="checkbox" class="checkbox" id="vacancy" onclick="filter('vacancy', 'vacancy_text');"/><label for="vacancy" id="vacancy_text">Only committees with vacancies</label>
+              
+              <!--~~~~~~~~~~~~~~~ Position ~~~~~~~~~~~~~~~-->
               <p style="color:gray;margin-left:20px;">Position:</p>
               <div class="filter_container">
                 <input type="checkbox" class="checkbox" id="al" onclick="filter('al', 'al_text');"/><label for="al" id="al_text">At Large (AL)</label><br>
@@ -637,6 +736,8 @@
                 <input type="checkbox" class="checkbox" id="nsm" onclick="filter('nsm','nsm_text');"/><label for="nsm" id="nsm_text">Natural Science and Math (NSM)</label><br>
                 <input type="checkbox" class="checkbox" id="hum" onclick="filter('hum','hum_text');"/><label for="hum" id="hum_text">Humanities (HUM)</label><br>
               </div>
+              
+              <!--~~~~~~~~~~~~~~~~~ Points ~~~~~~~~~~~~~~~-->
               <p style="color:gray;margin-left:20px;">Points:</p>
               <div class="filter_container">
                 <input type="checkbox" class="checkbox" id="0_pt" onclick="filter('0_pt','0_pt_text');"/><label for="0_pt" id="0_pt_text">0</label>
@@ -647,13 +748,13 @@
             </div>
              
               
-              
+            <!--~~~~~~~~~~~~~~~ Submit ~~~~~~~~~~~~~~~~-->
 			<input type="button" value="Submit Changes" id="submit_changes" onclick="checkout()"/>
 			<div id="are_you_sure">
 				<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Grey_close_x.svg/1024px-Grey_close_x.svg.png" class="close-icon" id="close_msg" onclick="deleteMsg();">
 			</div>
               
+              
 		</div> <!--main body end -->
 	</body>
 </html>
-
